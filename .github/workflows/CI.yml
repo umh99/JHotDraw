@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: ["develop"]
 jobs:
-  build:
+  build-and-run:
     runs-on: ubuntu-latest
     
     steps:
@@ -12,12 +12,7 @@ jobs:
     
       - name: Build project
         run: mvn clean install -DskipTests
-      
-  execute:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
+        
       - name: Checkout repository
         uses: actions/checkout@v4
         
