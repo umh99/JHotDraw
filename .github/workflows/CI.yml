@@ -11,10 +11,7 @@ jobs:
         uses: actions/checkout@v4
     
       - name: Build project
-        run: mvn clean install -DskipTests --settings maven-settings.xml
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: mvn clean install -DskipTests
       
   execute:
     runs-on: ubuntu-latest
@@ -25,4 +22,4 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Run project
-        run: cd jhotdraw-samples/jhotdraw-samples-misc && mvn exec:java "-Dexec.mainClass=org.jhotdraw.samples.svg.Main"
+        run: mvn -pl jhotdraw-samples/jhotdraw-samples-misc exec:java -Dexec.mainClass=org.jhotdraw.samples.svg.Main
