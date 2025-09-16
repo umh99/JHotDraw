@@ -3,8 +3,15 @@ on:
   pull_request:
     branches: ["develop"]
 jobs:
-  build-and-run:
+  build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [jhotdraw-core, jhotdraw-utils]
+    defaults:
+      run:
+        working-directory: ${{ matrix.module }}
+
     
     steps:
       - name: Checkout repository
@@ -13,6 +20,6 @@ jobs:
       - name: Build project
         run: mvn clean install -DskipTests
         
-      - name: Run project
-        run: mvn -pl jhotdraw-samples/jhotdraw-samples-misc exec:java -Dexec.mainClass=org.jhotdraw.samples.svg.Main -Djava.awt.headless=true
+      - name: Run tests
+        run: mvn tests
 
