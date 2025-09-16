@@ -1,5 +1,12 @@
 # jhotdraw
 
+## Install and Run
+Install (**in project root**):
+mvn clean install -DskipTests
+
+Run (**in jhotdraw-samples-misc**):
+mvn exec:java "-Dexec.mainClass=org.jhotdraw.samples.svg.Main"
+
 * maven build process
 * restructured project layout
   * introduced submodules
