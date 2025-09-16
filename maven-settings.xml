@@ -17,7 +17,7 @@
                 </repository>
                 <repository>
                     <id>github</id>
-                    <url>https://maven.pkg.github.com/umh99/JHotDraw</url>
+                    <url>https://maven.pkg.github.com/sweat-tek/MavenRepository</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
