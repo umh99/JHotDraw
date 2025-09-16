@@ -13,8 +13,5 @@ jobs:
       - name: Build project
         run: mvn clean install -DskipTests
         
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
       - name: Run project
         run: mvn -pl jhotdraw-samples/jhotdraw-samples-misc exec:java -Dexec.mainClass=org.jhotdraw.samples.svg.Main
