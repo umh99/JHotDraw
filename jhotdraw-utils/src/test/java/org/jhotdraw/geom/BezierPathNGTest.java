@@ -86,7 +86,7 @@ public class BezierPathNGTest {
         c0 = new Point2D.Double(21.0004, 56.92827);
         instance.add(c0);
         Point2D.Double[] toPolygonArray = instance.toPolygonArray();
-        assertEquals(toPolygonArray.length, 2);
+        assertEquals(toPolygonArray.length, 3);
         for (int i = 0; i < toPolygonArray.length; i++) {
             for (int j = 0; j < 3; j++) {
                 assertEquals(toPolygonArray[i], instance.get(i).getControlPoint(j));
