@@ -1,30 +1,22 @@
 package org.jhotdraw.undo;
 
-import javax.swing.*;
 import javax.swing.undo.CannotUndoException;
-import java.awt.event.ActionEvent;
 
 /**
  * Undo Action for use in a menu bar.
  */
-class UndoAction extends AbstractAction {
-
-    private static final long serialVersionUID = 1L;
-    private final UndoRedoManager manager;
+class UndoAction extends AbstractUndoRedoAction  {
 
     public UndoAction(UndoRedoManager undoRedoManger) {
-        manager = undoRedoManger;
-        UndoRedoManager.getLabels().configureAction(this, "edit.undo");
-        setEnabled(false);
+        super(undoRedoManger, "undo");
     }
-
     /**
      * Invoked when an action occurs.
      */
     @Override
-    public void actionPerformed(ActionEvent evt) {
+    protected void performAction() {
         try {
-            manager.undo();
+            super.getManager().undo();
         } catch (CannotUndoException e) {
             System.err.println("Cannot undo: " + e);
             e.printStackTrace();
