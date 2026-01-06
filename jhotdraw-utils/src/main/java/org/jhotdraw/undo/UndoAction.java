@@ -1,6 +1,7 @@
 package org.jhotdraw.undo;
 
 import javax.swing.undo.CannotUndoException;
+import java.util.logging.Level;
 
 /**
  * Undo Action for use in a menu bar.
@@ -18,8 +19,7 @@ class UndoAction extends AbstractUndoRedoAction  {
         try {
             super.getManager().undo();
         } catch (CannotUndoException e) {
-            System.err.println("Cannot undo: " + e);
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Cannot undo: ", e);
         }
     }
 }
