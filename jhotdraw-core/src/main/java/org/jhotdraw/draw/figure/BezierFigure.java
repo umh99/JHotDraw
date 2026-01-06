@@ -24,6 +24,7 @@ import org.jhotdraw.draw.handle.BezierOutlineHandle;
 import org.jhotdraw.draw.handle.BezierScaleHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.TransformHandleKit;
+import org.jhotdraw.geom.Bezier;
 import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.geom.GrowStroke;
@@ -170,46 +171,59 @@ public class BezierFigure extends AbstractAttributedFigure {
     @Override
     public boolean contains(Point2D.Double p) {
         double tolerance = Math.max(2f, AttributeKeys.getStrokeTotalWidth(this, 1.0) / 2d);
-        if (isClosed() || get(FILL_COLOR) != null && get(UNCLOSED_PATH_FILLED)) {
-            if (path.contains(p)) {
+        if (isClosedOrFilledUnclosedPath()) {
+            if (containsFillOrStroke(p)) {
                 return true;
             }
-            double grow = AttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d;
-            GrowStroke gs = new GrowStroke(grow,
-                    AttributeKeys.getStrokeTotalWidth(this, 1.0)
-                    * get(STROKE_MITER_LIMIT));
-            if (gs.createStrokedShape(path).contains(p)) {
-                return true;
-            } else {
-                if (isClosed()) {
-                    return false;
-                }
+            if (isClosed()) {
+                return false;
             }
         }
-        if (!isClosed()) {
-            if (getCappedPath().outlineContains(p, tolerance)) {
-                return true;
-            }
-            if (get(START_DECORATION) != null) {
-                BezierPath cp = getCappedPath();
-                Point2D.Double p1 = path.get(0, 0);
-                Point2D.Double p2 = cp.get(0, 0);
-                // FIXME - Check here, if caps path contains the point
-                if (Geom.lineContainsPoint(p1.x, p1.y, p2.x, p2.y, p.x, p.y, tolerance)) {
-                    return true;
-                }
-            }
-            if (get(END_DECORATION) != null) {
-                BezierPath cp = getCappedPath();
-                Point2D.Double p1 = path.get(path.size() - 1, 0);
-                Point2D.Double p2 = cp.get(path.size() - 1, 0);
-                // FIXME - Check here, if caps path contains the point
-                if (Geom.lineContainsPoint(p1.x, p1.y, p2.x, p2.y, p.x, p.y, tolerance)) {
-                    return true;
-                }
-            }
+        return !isClosed() && containsOpenPathDetails(p, tolerance);
+    }
+
+    private boolean isClosedOrFilledUnclosedPath() {
+        return isClosed() || get(FILL_COLOR) != null && get(UNCLOSED_PATH_FILLED);
+    }
+
+    private boolean containsFillOrStroke(Point2D.Double p){
+        if (path.contains(p)){
+            return true;
         }
-        return false;
+
+        double grow = AttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d;
+        GrowStroke gs = new GrowStroke(
+                grow,
+                AttributeKeys.getStrokeTotalWidth(this, 1.0) * get(STROKE_MITER_LIMIT)
+        );
+        return gs.createStrokedShape(path).contains(p);
+    }
+
+    private boolean containsOpenPathDetails(Point2D.Double p, double tolerance){
+        if (getCappedPath().outlineContains(p, tolerance)){
+            return true;
+        }
+        return startDecorationContains(p, tolerance) || endDecorationContains(p, tolerance);
+    }
+
+    private boolean startDecorationContains(Point2D.Double p, double tolerance){
+        if (get(START_DECORATION) == null){
+            return false;
+        }
+        BezierPath cp = getCappedPath();
+        Point2D.Double p1 = path.get(0, 0);
+        Point2D.Double p2 = cp.get(0, 0);
+        return Geom.lineContainsPoint(p1.x, p1.y, p2.x, p2.y, p.x, p.y, tolerance);
+    }
+
+    private boolean endDecorationContains(Point2D.Double p, double tolerance){
+        if (get(END_DECORATION) == null){
+            return false;
+        }
+        BezierPath cp = getCappedPath();
+        Point2D.Double p1 = path.get(path.size() - 1, 0);
+        Point2D.Double p2 = cp.get(path.size() - 1, 0);
+        return Geom.lineContainsPoint(p1.x, p1.y, p2.x, p2.y, p.x, p.y, tolerance);
     }
 
     @Override
