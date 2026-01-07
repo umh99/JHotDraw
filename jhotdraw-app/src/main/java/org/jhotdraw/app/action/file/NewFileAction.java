@@ -61,7 +61,7 @@ public class NewFileAction extends AbstractApplicationAction {
         }
         newView.setMultipleOpenId(multiOpenId);
         app.add(newView);
-        newView.execute(() -> newView.clear());
+        newView.execute(newView::clear);
         app.show(newView);
     }
 }
