@@ -79,12 +79,9 @@ public class EllipseFigure extends AbstractAttributedFigure {
 
     @Override
     protected void drawFill(Graphics2D g) {
-        Ellipse2D.Double r = (Ellipse2D.Double) ellipse.clone();
-        double grow = AttributeKeys.getPerpendicularFillGrowth(this, AttributeKeys.getScaleFactorFromGraphics(g));
-        r.x -= grow;
-        r.y -= grow;
-        r.width += grow * 2;
-        r.height += grow * 2;
+        double grow = AttributeKeys.getPerpendicularFillGrowth(
+            this, AttributeKeys.getScaleFactorFromGraphics(g));
+        Ellipse2D.Double r = createGrownEllipse(grow);
         if (r.width > 0 && r.height > 0) {
             g.fill(r);
         }
@@ -92,30 +89,25 @@ public class EllipseFigure extends AbstractAttributedFigure {
 
     @Override
     protected void drawStroke(Graphics2D g) {
-        Ellipse2D.Double r = (Ellipse2D.Double) ellipse.clone();
-        double grow = AttributeKeys.getPerpendicularDrawGrowth(this, AttributeKeys.getScaleFactorFromGraphics(g));
-        r.x -= grow;
-        r.y -= grow;
-        r.width += grow * 2;
-        r.height += grow * 2;
+        double grow = AttributeKeys.getPerpendicularDrawGrowth(
+                this, AttributeKeys.getScaleFactorFromGraphics(g));
+        Ellipse2D.Double r = createGrownEllipse(grow);
         if (r.width > 0 && r.height > 0) {
             g.draw(r);
         }
     }
+
 
     /**
      * Checks if a Point2D.Double is inside the figure.
      */
     @Override
     public boolean contains(Point2D.Double p) {
-        Ellipse2D.Double r = (Ellipse2D.Double) ellipse.clone();
         double grow = AttributeKeys.getPerpendicularHitGrowth(this, 1.0);
-        r.x -= grow;
-        r.y -= grow;
-        r.width += grow * 2;
-        r.height += grow * 2;
+        Ellipse2D.Double r = createGrownEllipse(grow);
         return r.contains(p);
     }
+
 
     private void setEllipse(double x, double y, double width, double height) {
         ellipse.x = x;
@@ -168,4 +160,14 @@ public class EllipseFigure extends AbstractAttributedFigure {
     public Object getTransformRestoreData() {
         return ellipse.clone();
     }
+
+    private Ellipse2D.Double createGrownEllipse(double grow) {
+        Ellipse2D.Double r = (Ellipse2D.Double) ellipse.clone();
+        r.x -= grow;
+        r.y -= grow;
+        r.width += grow * 2;
+        r.height += grow * 2;
+        return r;
+    }
+
 }
