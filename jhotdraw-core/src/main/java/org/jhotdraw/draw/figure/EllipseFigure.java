@@ -117,13 +117,24 @@ public class EllipseFigure extends AbstractAttributedFigure {
         return r.contains(p);
     }
 
+    private void setEllipse(double x, double y, double width, double height) {
+        ellipse.x = x;
+        ellipse.y = y;
+        ellipse.width = width;
+        ellipse.height = height;
+    }
+
+
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        ellipse.x = Math.min(anchor.x, lead.x);
-        ellipse.y = Math.min(anchor.y, lead.y);
-        ellipse.width = Math.max(0.1, Math.abs(lead.x - anchor.x));
-        ellipse.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
+        setEllipse(
+                Math.min(anchor.x, lead.x),
+                Math.min(anchor.y, lead.y),
+                Math.max(0.1, Math.abs(lead.x - anchor.x)),
+                Math.max(0.1, Math.abs(lead.y - anchor.y))
+        );
     }
+
 
     /**
      * Transforms the figure.
@@ -149,11 +160,9 @@ public class EllipseFigure extends AbstractAttributedFigure {
     @Override
     public void restoreTransformTo(Object geometry) {
         Ellipse2D.Double e = (Ellipse2D.Double) geometry;
-        ellipse.x = e.x;
-        ellipse.y = e.y;
-        ellipse.width = e.width;
-        ellipse.height = e.height;
+        setEllipse(e.x, e.y, e.width, e.height);
     }
+
 
     @Override
     public Object getTransformRestoreData() {
