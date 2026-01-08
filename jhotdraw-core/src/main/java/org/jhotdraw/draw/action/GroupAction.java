@@ -26,6 +26,8 @@ public class GroupAction extends AbstractSelectedAction {
     private static final long serialVersionUID = 1L;
     public static final String ID = "edit.groupSelection";
     protected CompositeFigure prototype;
+    private  GroupingService groupingService = new GroupingService();
+
     /**
      * If this variable is true, this action groups figures.
      * If this variable is false, this action ungroups figures.
@@ -45,7 +47,6 @@ public class GroupAction extends AbstractSelectedAction {
     public GroupAction(DrawingEditor editor, CompositeFigure prototype, boolean isGroupingAction) {
         super(editor);
         this.prototype = prototype;
-        // this.isGroupingAction = isGroupingAction;
         ResourceBundleUtil labels
                 = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
         labels.configureAction(this, ID);
@@ -61,17 +62,6 @@ public class GroupAction extends AbstractSelectedAction {
         return getView() != null && getView().getSelectionCount() > 1;
     }
 
-    /*
-    protected boolean canUngroup() {
-        return getView() != null
-                && getView().getSelectionCount() == 1
-                && prototype != null
-                && getView().getSelectedFigures().iterator().next().getClass().equals(
-                        prototype.getClass());
-    }
-
-     */
-
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         if (!canGroup()) return;
@@ -85,23 +75,9 @@ public class GroupAction extends AbstractSelectedAction {
 
         UndoableEdit edit = createGroupEdit(view, group, ungroupedFigures);
 
-        groupFigures(view, group, ungroupedFigures);
+        groupingService.group(view, group, ungroupedFigures);
         fireUndoableEditHappened(edit);
     }
-
-    /*
-    private void performUngroup() {
-        final DrawingView view = getView();
-        final CompositeFigure group = (CompositeFigure) view.getSelectedFigures().iterator().next();
-        final LinkedList<Figure> ungroupedFigures = new LinkedList<>();
-
-        UndoableEdit edit = createUngroupEdit(view, group, ungroupedFigures);
-
-        ungroupedFigures.addAll(ungroupFigures(view, group));
-        fireUndoableEditHappened(edit);
-    }
-
-     */
 
     private UndoableEdit createGroupEdit(final DrawingView view, final CompositeFigure group, final LinkedList<Figure> ungroupedFigures) {
         return new AbstractUndoableEdit() {
@@ -116,12 +92,12 @@ public class GroupAction extends AbstractSelectedAction {
             @Override
             public void redo() throws CannotRedoException {
                 super.redo();
-                groupFigures(view, group, ungroupedFigures);
+                groupingService.group(view, group, ungroupedFigures);
             }
 
             @Override
             public void undo() throws CannotUndoException {
-                ungroupFigures(view, group);
+                groupingService.ungroup(view, group);
                 super.undo();
             }
 
@@ -132,56 +108,14 @@ public class GroupAction extends AbstractSelectedAction {
         };
     }
 
-    /*
-    private UndoableEdit createUngroupEdit(final DrawingView view,  final CompositeFigure group,  final LinkedList<Figure> ungroupedFigures) {
-        return new AbstractUndoableEdit() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String getPresentationName() {
-                ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-                return labels.getString("edit.ungroupSelection.text");
-            }
-
-            @Override
-            public void redo() throws CannotRedoException {
-                super.redo();
-                ungroupFigures(view, group);
-            }
-
-            @Override
-            public void undo() throws CannotUndoException {
-                groupFigures(view, group, ungroupedFigures);
-                super.undo();
-            }
-        };
-    }
-
-     */
-
+    // Keep these methods for subclasses like SplitAction
     public Collection<Figure> ungroupFigures(DrawingView view, CompositeFigure group) {
-// XXX - This code is redundant with UngroupAction
-        LinkedList<Figure> figures = new LinkedList<>(group.getChildren());
-        view.clearSelection();
-        group.basicRemoveAllChildren();
-        view.getDrawing().basicAddAll(view.getDrawing().indexOf(group), figures);
-        view.getDrawing().remove(group);
-        view.addToSelection(figures);
-        return figures;
+        return groupingService.ungroup(view, group);
     }
 
     public void groupFigures(DrawingView view, CompositeFigure group, Collection<Figure> figures) {
-        Collection<Figure> sorted = view.getDrawing().sort(figures);
-        int index = view.getDrawing().indexOf(sorted.iterator().next());
-        view.getDrawing().basicRemoveAll(figures);
-        view.clearSelection();
-        view.getDrawing().add(index, group);
-        group.willChange();
-        for (Figure f : sorted) {
-            f.willChange();
-            group.basicAdd(f);
-        }
-        group.changed();
-        view.addToSelection(group);
+        groupingService.group(view, group, figures);
     }
+
+
 }

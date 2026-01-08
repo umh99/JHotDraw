@@ -30,12 +30,7 @@ public class UngroupAction extends GroupAction {
 
     private static final long serialVersionUID = 1L;
     public static final String ID = "edit.ungroupSelection";
-    /**
-     * Creates a new instance.
-     */
-    /**
-     * Creates a new instance.
-     */
+    protected final GroupingService groupingService = new GroupingService();
 
     public UngroupAction(DrawingEditor editor) {
         this(editor, new GroupFigure());
@@ -71,7 +66,7 @@ public class UngroupAction extends GroupAction {
 
         UndoableEdit edit = createUngroupEdit(view, group, ungroupedFigures);
 
-        ungroupedFigures.addAll(ungroupFigures(view, group));
+        ungroupedFigures.addAll(groupingService.ungroup(view, group));
         fireUndoableEditHappened(edit);
     }
 
@@ -88,12 +83,12 @@ public class UngroupAction extends GroupAction {
             @Override
             public void redo() throws CannotRedoException {
                 super.redo();
-                ungroupFigures(view, group);
+                groupingService.ungroup(view, group);
             }
 
             @Override
             public void undo() throws CannotUndoException {
-                groupFigures(view, group, ungroupedFigures);
+                groupingService.group(view, group, ungroupedFigures);
                 super.undo();
             }
         };
